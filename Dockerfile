@@ -32,6 +32,12 @@ RUN npm ci --production
 COPY --from=builder /app/.output /app/.output
 COPY --from=builder /app/.nuxt /app/.nuxt
 
+# Create database directory and copy the existing database
+COPY server/db/articles.sqlite /app/server/db/articles.sqlite
+
+# Set proper permissions for the database file
+RUN chown -R node:node /app/server/db
+
 # Expose the port the app runs on
 EXPOSE 3000
 
@@ -39,6 +45,9 @@ EXPOSE 3000
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000
+
+# Switch to non-root user
+USER node
 
 # Start the application
 CMD ["node", ".output/server/index.mjs"]
